@@ -1,34 +1,34 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-import VueAccueil from '@/views/VueAccueil.vue'
+import HomeView from '@/views/HomeView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    name: 'accueil',
-    component: VueAccueil,
+    name: 'home',
+    component: HomeView,
   },
   {
-    // La fiche est chargée à la demande : l'accueil reste le plus léger possible.
+    // Loaded on demand, so the landing view stays as light as possible.
     path: '/objet/:id',
-    name: 'objet',
-    component: () => import('@/views/VueObjet.vue'),
+    name: 'object',
+    component: () => import('@/views/ObjectView.vue'),
     props: true,
   },
   {
-    path: '/:chemin(.*)*',
-    name: 'introuvable',
-    component: () => import('@/views/VueIntrouvable.vue'),
+    path: '/:path(.*)*',
+    name: 'not-found',
+    component: () => import('@/views/NotFoundView.vue'),
   },
 ]
 
 export const router = createRouter({
-  // `BASE_URL` suit `VITE_BASE` : l'app fonctionne à la racine comme en sous-répertoire.
+  // BASE_URL follows VITE_BASE: the app works at the root and in a subdirectory alike.
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  scrollBehavior(vers, depuis, positionSauvegardee) {
-    if (positionSauvegardee) return positionSauvegardee
-    // Changer de terme de recherche ne doit pas renvoyer en haut de page à chaque frappe.
-    if (vers.name === depuis.name && vers.name === 'accueil') return {}
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) return savedPosition
+    // Changing the search term must not jump back to the top on every keystroke.
+    if (to.name === from.name && to.name === 'home') return {}
     return { top: 0 }
   },
 })
