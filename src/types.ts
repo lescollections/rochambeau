@@ -1,75 +1,78 @@
 /**
- * Types du format « lescollections-vitrine/1 ».
- * Contrat figé le 2026-08-11 — voir example/formatvitrine.md.
+ * Types for the "lescollections-vitrine/1" format.
+ * Contract frozen on 2026-08-11 — see example/formatvitrine.md.
+ *
+ * Property names below are the actual JSON keys, which the format defines in
+ * French: they are part of the contract and must not be translated.
  */
 
-export const FORMAT_ATTENDU = 'lescollections-vitrine/1'
+export const EXPECTED_FORMAT = 'lescollections-vitrine/1'
 
-/** Type d'un champ du schéma. `texte` est le seul type de la v1 ; les autres sont réservés. */
-export type TypeChamp = 'texte' | 'date' | 'nombre' | 'liste'
+/** Field type. "texte" is the only v1 type; the others are reserved. */
+export type FieldType = 'texte' | 'date' | 'nombre' | 'liste'
 
-export interface Champ {
-  /** Clé technique, référencée par les objets. */
+export interface Field {
+  /** Technical key, referenced by objects. */
   code: string
-  /** Intitulé affiché. */
+  /** Displayed label. */
   libelle: string
-  type: TypeChamp
-  /** Champ proposé comme filtre. Non exploité en v1 de la vitrine, mais conservé. */
+  type: FieldType
+  /** Field offered as a filter. Unused in v1 of the showcase, but preserved. */
   facette?: boolean
 }
 
-export interface InfosCollection {
+export interface CollectionInfo {
   slug: string
   titre: string
   description?: string
-  /** Code de langue de la collection (« fr », « en »…). */
+  /** Collection language code ("fr", "en"…). */
   langue?: string
   nb_objets: number
 }
 
-export interface Manifeste {
+export interface Manifest {
   format: string
   genere_le?: string
-  collection: InfosCollection
-  /** Schéma des champs. **L'ordre est l'ordre d'affichage.** */
-  champs: Champ[]
-  /** Nom du fichier NDJSON, relatif au manifeste. */
+  collection: CollectionInfo
+  /** Field schema. **Order is display order.** */
+  champs: Field[]
+  /** NDJSON file name, relative to the manifest. */
   objets: string
 }
 
-export interface Image {
-  /** URL de la version d'affichage pleine (jamais l'original). */
+export interface Picture {
+  /** URL of the full display version (never the original). */
   plein: string
-  /** URL de la vignette. Peut être identique à `plein`. */
+  /** Thumbnail URL. May be identical to `plein`. */
   apercu: string
-  /** Largeur en pixels de `plein`, pour réserver la place. */
+  /** Width of `plein` in pixels, used to reserve layout space. */
   l?: number
-  /** Hauteur en pixels de `plein`. */
+  /** Height of `plein` in pixels. */
   h?: number
   legende?: string
-  /** Image de couverture de l'objet — une seule par objet. */
+  /** Cover image of the object — only one per object. */
   principale?: boolean
 }
 
-/** Une valeur de champ : chaîne, ou tableau de chaînes si le champ est multi-valué. */
-export type ValeurChamp = string | string[]
+/** A field value: a string, or an array of strings when the field is multi-valued. */
+export type FieldValue = string | string[]
 
-export interface Objet {
-  /** Identifiant stable (n° d'inventaire), unique dans la collection. */
+export interface CollectionObject {
+  /** Stable identifier (accession number), unique within the collection. */
   id: string
   titre: string
-  /** Métadonnées par `code` du schéma. Seuls les champs non vides sont présents. */
-  champs: Record<string, ValeurChamp>
-  images: Image[]
+  /** Metadata keyed by schema `code`. Only non-empty fields are present. */
+  champs: Record<string, FieldValue>
+  images: Picture[]
   credit?: string
 }
 
-/** Un objet enrichi des données dérivées calculées une fois au chargement. */
-export interface ObjetIndexe extends Objet {
-  /** Position dans le fichier, qui fait foi pour l'ordre d'affichage. */
-  rang: number
-  /** Image de couverture : la principale, à défaut la première. */
-  couverture?: Image
-  /** Texte concaténé et normalisé de l'objet, pour la recherche. */
-  texteRecherche: string
+/** An object enriched with derived data computed once at load time. */
+export interface IndexedObject extends CollectionObject {
+  /** Position in the file, which defines display order. */
+  rank: number
+  /** Cover image: the one flagged as main, or the first one available. */
+  cover?: Picture
+  /** Concatenated, normalized text of the object, used for search. */
+  searchText: string
 }
