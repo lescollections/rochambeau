@@ -1,0 +1,63 @@
+{
+  "format": "lescollections-vitrine/1",
+  "genere_le": "2026-08-11T00:00:00Z",
+  "collection": {
+    "slug": "augustins",
+    "titre": "Œuvres déposées au musée des Augustins",
+    "description": "Jeu de démonstration — inventaire opendata de Toulouse Métropole.",
+    "langue": "fr",
+    "nb_objets": 108
+  },
+  "champs": [
+    {
+      "code": "denomination",
+      "libelle": "Dénomination",
+      "type": "texte"
+    },
+    {
+      "code": "auteur",
+      "libelle": "Auteur",
+      "type": "texte",
+      "facette": true
+    },
+    {
+      "code": "datation",
+      "libelle": "Datation",
+      "type": "texte",
+      "facette": true
+    },
+    {
+      "code": "domaine",
+      "libelle": "Domaine",
+      "type": "texte",
+      "facette": true
+    },
+    {
+      "code": "materiaux",
+      "libelle": "Matériaux",
+      "type": "texte"
+    },
+    {
+      "code": "technique",
+      "libelle": "Technique",
+      "type": "texte"
+    },
+    {
+      "code": "dimensions",
+      "libelle": "Dimensions",
+      "type": "texte"
+    },
+    {
+      "code": "provenance",
+      "libelle": "Provenance",
+      "type": "texte"
+    },
+    {
+      "code": "localisation",
+      "libelle": "Localisation",
+      "type": "texte",
+      "facette": true
+    }
+  ],
+  "objets": "objets.ndjson"
+}
