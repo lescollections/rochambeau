@@ -26,9 +26,12 @@ export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) return savedPosition
+    // `instant` overrides the smooth scrolling declared for anchors: following
+    // a link should show the new page at once, not travel back up to it — and
+    // the banner would fold along the way.
+    if (savedPosition) return { ...savedPosition, behavior: 'instant' }
     // Changing the search term must not jump back to the top on every keystroke.
     if (to.name === from.name && to.name === 'home') return {}
-    return { top: 0 }
+    return { top: 0, behavior: 'instant' }
   },
 })

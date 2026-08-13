@@ -8,6 +8,10 @@ Rochambeau is a PWA, a public frontend for collections display, based on an expo
 
 Rochambeau is being developed for the lescollections.fr project as a lightweight alternative to Pawtucket for small collections: collections are streamed from Apache (JSON plus images), and most interactions are handled directly in the browser's memory.
 
+## I'd prefer a theme for Pawtucket
+
+Have a look at [github.com/deploiement-ideesculture/onePagePawtucket](https://github.com/deploiement-ideesculture/onePagePawtucket)
+
 ## Why this name... ?
 
 Rochambeau is the connecting thread. Born in Vendôme in 1725, an hour's drive from Le Mans, the marshal landed at Newport in 1780 with 6,000 men, on the very shore that now holds his monument. His family château still overlooks the Loir at Thoré-la-Rochette, while an avenue and a public library in Providence carry his name — two territories, a single place name, and an unbroken round trip spanning two and a half centuries.
