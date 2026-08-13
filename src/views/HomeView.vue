@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCollection } from '@/composables/useCollection'
 import { search } from '@/lib/search'
@@ -46,6 +46,25 @@ function withoutQuery() {
 
 const results = computed(() => search(objects.value, query.value))
 
+/**
+ * Card whose caption is showing, where a tap replaces hovering. Only one at a
+ * time, and a tap anywhere else closes it: several open captions would turn
+ * the list back into a wall of titles.
+ */
+const revealed = ref<string | null>(null)
+
+function closeCaption(event: PointerEvent) {
+  const target = event.target
+  if (target instanceof Element && target.closest('a')) return
+  revealed.value = null
+}
+
+onMounted(() => document.addEventListener('pointerdown', closeCaption))
+onUnmounted(() => document.removeEventListener('pointerdown', closeCaption))
+
+// A new search starts over: the revealed card is probably gone from the list.
+watch(results, () => (revealed.value = null))
+
 /** The first field flagged as a facet doubles as the caption under thumbnails. */
 const captionField = computed(() => fields.value.find((field) => field.facette)?.code)
 </script>
@@ -76,7 +95,13 @@ const captionField = computed(() => fields.value.find((field) => field.facette)?
       class="mt-6 columns-3 gap-4 min-[800px]:columns-4 min-[1200px]:columns-6 min-[1600px]:columns-8"
     >
       <li v-for="object in results" :key="object.id" class="mb-4 break-inside-avoid">
-        <ObjectCard :object="object" :query="query" :caption-field="captionField" />
+        <ObjectCard
+          :object="object"
+          :query="query"
+          :caption-field="captionField"
+          :revealed="revealed === object.id"
+          @reveal="revealed = $event"
+        />
       </li>
     </ul>
   </div>
