@@ -15,7 +15,6 @@ type Messages = Record<string, string>
 
 const MESSAGES: Record<Locale, Messages> = {
   fr: {
-    'app.title': 'Vitrine de collection',
     'app.skip_to_content': 'Aller au contenu',
     'app.back_to_collection': 'Retour à la collection',
 
@@ -64,7 +63,6 @@ const MESSAGES: Record<Locale, Messages> = {
     'footer.objects': 'Catalogue vide | {n} œuvre au catalogue | {n} œuvres au catalogue',
   },
   en: {
-    'app.title': 'Collection showcase',
     'app.skip_to_content': 'Skip to content',
     'app.back_to_collection': 'Back to the collection',
 

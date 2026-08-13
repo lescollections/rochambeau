@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { drawHalftone, loadScreenableImage, type HalftoneOptions } from '@/lib/halftone'
+import {
+  drawHalftone,
+  loadScreenableImage,
+  type HalftoneOptions,
+  type ScreenSource,
+} from '@/lib/halftone'
 
 /**
  * The dial of the effect. A plain grey wash lets the motif read best, which is
@@ -21,7 +26,7 @@ const canvas = ref<HTMLCanvasElement | null>(null)
 const painted = ref(false)
 
 /** Kept so a resize can redraw the screen without downloading again. */
-let picture: HTMLImageElement | null = null
+let picture: ScreenSource | null = null
 /** Discards a slow picture when the visitor has already moved to another record. */
 let generation = 0
 let observer: ResizeObserver | null = null

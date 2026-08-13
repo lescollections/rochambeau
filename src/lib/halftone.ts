@@ -26,35 +26,78 @@ export interface HalftoneOptions {
   dotted?: boolean
 }
 
+export interface ScreenSource {
+  image: HTMLImageElement
+  /** Whether the canvas may read this picture's pixels back. */
+  readable: boolean
+}
+
 /**
- * Loads a picture the canvas is allowed to read back. Servers that answer
- * without CORS headers reject here, which is the signal to drop the effect.
+ * Hosts that turned out to serve without CORS headers. One picture is enough to
+ * learn it, and the rest of the collection is then loaded plainly — a browser
+ * has no silent way to ask, so this keeps the failure to a single console line
+ * per host instead of one per record.
  */
-export function loadScreenableImage(src: string): Promise<HTMLImageElement> {
+const opaqueHosts = new Set<string>()
+
+/**
+ * Loads the picture, asking for read access only when it can be granted.
+ *
+ * Drawing a third-party picture into a canvas is allowed; reading its pixels
+ * back is not, and no trick works around it — a `fetch` is refused all the
+ * same, `no-cors` yields an opaque response, and `toBlob` on a canvas that
+ * holds the picture throws. Only the serving host can lift it, by sending
+ * `Access-Control-Allow-Origin`. So the effect does not depend on it: an
+ * unreadable picture is still drawn, on a generic curve instead of its own.
+ */
+export function loadScreenableImage(src: string): Promise<ScreenSource> {
+  const foreign = foreignHost(src)
+  if (foreign === null) return load(src, false).then((image) => ({ image, readable: true }))
+  if (opaqueHosts.has(foreign)) return load(src, false).then((image) => ({ image, readable: false }))
+
+  return load(src, true).then(
+    (image) => ({ image, readable: true }),
+    () => {
+      opaqueHosts.add(foreign)
+      return load(src, false).then((image) => ({ image, readable: false }))
+    },
+  )
+}
+
+/** Origin of `src` when it is not ours, null when the picture is same-origin. */
+function foreignHost(src: string): string | null {
+  try {
+    const { origin } = new URL(src, window.location.href)
+    return origin === window.location.origin ? null : origin
+  } catch {
+    return null
+  }
+}
+
+function load(src: string, cors: boolean): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image()
-    image.crossOrigin = 'anonymous'
+    if (cors) image.crossOrigin = 'anonymous'
     image.decoding = 'async'
     image.onload = () => resolve(image)
-    image.onerror = () => reject(new Error(`halftone: ${src} cannot be read back`))
+    image.onerror = () => reject(new Error(`halftone: ${src} did not load`))
     image.src = src
   })
 }
 
 /**
- * Screens `image` onto `canvas`.
- * Returns false when the pixels stay out of reach, so the caller can hide it.
+ * Screens `source` onto `canvas`. Returns false when there is nothing to draw.
  */
 export function drawHalftone(
   canvas: HTMLCanvasElement,
-  image: HTMLImageElement,
+  source: ScreenSource,
   width: number,
   height: number,
   options: HalftoneOptions = {},
 ): boolean {
+  const { image } = source
   const step = options.step ?? 4
   const angle = ((options.angle ?? 45) * Math.PI) / 180
-  const dotted = options.dotted ?? true
 
   if (width < 1 || height < 1 || image.naturalWidth < 1) return false
 
@@ -72,9 +115,12 @@ export function drawHalftone(
   context.fillStyle = 'rgb(128, 128, 128)'
   context.fillRect(0, 0, width, height)
 
-  const grid = sampleCells(image, width, height, dotted ? step : 6)
-  if (!grid) return false
-  const levels = stretch(grid)
+  // A screen of dots needs a level per cell, so it can only be drawn from a
+  // readable picture; a wash falls back on a generic curve.
+  const wanted = options.dotted ?? true
+  const grid = source.readable ? sampleCells(image, width, height, wanted ? step : 6) : null
+  const levels = grid ? stretch(grid) : GENERIC_LEVELS
+  const dotted = wanted && grid !== null
 
   if (!dotted) {
     // Same levels, but as a continuous wash: `contrast` and `brightness` are
@@ -190,6 +236,16 @@ function stretch(grid: Grid): Levels {
   const margin = Math.round(grid.cells.length * 0.02)
   const low = percentile(histogram, margin)
   const high = percentile(histogram, grid.cells.length - 1 - margin)
+  return curve(low, high)
+}
+
+/**
+ * The curve used when the picture cannot be read back: the range a photograph
+ * usually occupies, which is close enough for a wash at 20% opacity.
+ */
+const GENERIC_LEVELS: Levels = curve(12, 235)
+
+function curve(low: number, high: number): Levels {
   const span = high - low
 
   // A flat picture has nothing to say: `contrast(0)` is the plain mid-grey the

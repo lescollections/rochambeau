@@ -2,7 +2,6 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useCollection } from '@/composables/useCollection'
-import { t } from '@/lib/i18n'
 import LocaleSelect from '@/components/LocaleSelect.vue'
 import HeaderHalftone from '@/components/HeaderHalftone.vue'
 
@@ -86,7 +85,12 @@ onBeforeUnmount(() => window.removeEventListener('scroll', readScroll))
                 : 'text-3xl text-balance delay-[400ms] sm:text-4xl md:text-5xl'
             "
           >
-            {{ info?.titre ?? t('app.title') }}
+            <!--
+              Nothing until the collection names itself: a placeholder title
+              would be read, then replaced. The non-breaking space holds the
+              line so the banner does not jump.
+            -->
+            {{ info?.titre ?? '\u00a0' }}
           </h1>
           <!--
             Halved as well: text-xs on a flat line-height, and a single line, so

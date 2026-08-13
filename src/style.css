@@ -65,6 +65,19 @@
   );
 }
 
+@utility no-picture-gradient {
+  background: linear-gradient(
+    90deg,
+    #efeefe 0%,
+    #e5de5d 16.667%,
+    #dacdac 33.333%,
+    #cfbcfb 50%,
+    #c4ac4a 66.667%,
+    #b99b99 83.333%,
+    #af8af8 100%
+  );
+}
+
 @utility skip-link {
   @apply sr-only rounded-md bg-stone-900 px-4 py-2 text-stone-50 focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50;
 }

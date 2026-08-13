@@ -5,9 +5,6 @@ import { formatDate, t } from '@/lib/i18n'
 
 const { manifest, objects, info } = useCollection()
 
-/** Build version, injected by Vite from package.json. */
-const version = __APP_VERSION__
-
 /** Each showcase gets its own subdomain, derived from the collection slug. */
 const domain = computed(() => (info.value?.slug ? `${info.value.slug}.lescollections.fr` : ''))
 </script>
@@ -24,8 +21,6 @@ const domain = computed(() => (info.value?.slug ? `${info.value.slug}.lescollect
           {{ domain }}
         </span>
         <span>{{ t('footer.objects', { n: objects.length }) }}</span>
-        <!-- Frozen in at build time: it is also what tells a new build apart. -->
-        <span class="tabular-nums">v{{ version }}</span>
       </p>
       <p v-if="manifest?.genere_le">
         {{ t('footer.generated_on', { date: formatDate(manifest.genere_le) }) }}

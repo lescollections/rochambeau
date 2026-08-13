@@ -45,16 +45,21 @@ const ratio = computed(() => {
       decoding="async"
       class="block w-full"
     />
-    <!-- Without a picture the caption is all there is, so it stays visible. -->
-    <div v-else class="flex aspect-4/5 items-center p-4">
+    <!--
+      Without a picture the caption is all there is, so it stays visible. The
+      gradient stands in for the missing picture, in both themes — hence the
+      type colours, which no longer follow the theme either: the ground under
+      them is light in both.
+    -->
+    <div v-else class="no-picture-gradient flex aspect-4/5 items-center p-4 text-stone-900">
       <div>
         <p class="font-serif leading-snug">
           <HighlightedText :text="object.titre" :query="query" />
         </p>
-        <p v-if="caption" class="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        <p v-if="caption" class="mt-1 text-sm text-stone-700">
           <HighlightedText :text="caption" :query="query" />
         </p>
-        <p class="mt-2 text-xs text-stone-400 dark:text-stone-500">{{ t('list.no_image') }}</p>
+        <p class="mt-2 text-xs text-stone-600">{{ t('list.no_image') }}</p>
       </div>
     </div>
 
