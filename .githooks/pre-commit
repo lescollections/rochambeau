@@ -1,0 +1,11 @@
+#!/bin/sh
+# Every commit ships its own version: raise the patch number and take it along.
+# Hooks live in the repository, so `git config core.hooksPath .githooks` has to
+# be run once per clone — see the README.
+#
+# `git commit --amend` runs this hook too, and would raise the number a second
+# time for the same commit: amend with --no-verify.
+set -e
+
+node scripts/bump-patch.mjs
+git add package.json package-lock.json

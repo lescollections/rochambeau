@@ -86,8 +86,8 @@ watch(
         </div>
       </div>
 
-      <!-- The header no longer sticks, so the offset is just breathing room. -->
-      <div class="md:sticky md:top-6 md:self-start">
+      <!-- Clear of the pinned banner, which is 86px tall at its widest. -->
+      <div class="md:sticky md:top-24 md:self-start">
         <h1 class="font-serif text-2xl leading-tight text-balance">{{ object.titre }}</h1>
 
         <dl class="mt-6 space-y-3 text-sm">

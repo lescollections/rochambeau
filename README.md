@@ -32,6 +32,22 @@ npm run typecheck
 In development, the files from `example/` (`collection.json`, `objets.ndjson`, `objets.csv`,
 `objets.xlsx`) are served at the server root, exactly where the app expects them in production.
 
+### Versioning
+
+Every commit ships its own version. A `pre-commit` hook raises the patch number in
+`package.json` (and in `package-lock.json`) and takes it along in the commit. Hooks live in the
+repository, so each clone activates them once:
+
+```sh
+git config core.hooksPath .githooks
+```
+
+The version is frozen into the bundle as `__APP_VERSION__`, shown in the footer. That is what
+makes a bump reach the visitor: the precached files change, the service worker sees a new build,
+and the update banner offers it — a code change alone would do the same, but a version bump makes
+it deliberate. Amending a commit runs the hook again, so amend with `--no-verify`. The dev server
+reads the version at startup: bump it and restart to see it change.
+
 ### Demo sets
 
 `example/` holds the Toulouse set (108 works, 40 of them without a picture). `example/cleveland/`
@@ -113,6 +129,23 @@ npm run typecheck
 
 En développement, les fichiers d'`example/` (`collection.json`, `objets.ndjson`, `objets.csv`,
 `objets.xlsx`) sont servis à la racine, exactement là où l'application les attend en production.
+
+### Versionnage
+
+Chaque commit porte sa propre version. Un hook `pre-commit` incrémente le numéro de correctif
+dans `package.json` (et dans `package-lock.json`) et l'emporte dans le commit. Les hooks sont
+versionnés dans le dépôt, chaque clone les active une fois :
+
+```sh
+git config core.hooksPath .githooks
+```
+
+La version est figée dans le bundle sous `__APP_VERSION__` et affichée dans le pied de page.
+C'est ce qui fait qu'une incrémentation atteint le visiteur : les fichiers préchargés changent,
+le service worker voit une nouvelle version et le bandeau de mise à jour la propose — une
+modification de code produirait le même effet, mais l'incrément le rend délibéré. Un
+`git commit --amend` rejoue le hook : amender avec `--no-verify`. Le serveur de développement lit
+la version au démarrage, il faut le relancer pour la voir changer.
 
 ### Jeux de démonstration
 

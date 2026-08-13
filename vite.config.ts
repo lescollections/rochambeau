@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
-import { createReadStream, existsSync } from 'node:fs'
+import { createReadStream, existsSync, readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
@@ -15,6 +15,16 @@ import { VitePWA } from 'vite-plugin-pwa'
  *   DEMO=cleveland npm run dev
  */
 const DEMO_FILES = ['collection.json', 'objets.ndjson', 'objets.csv', 'objets.xlsx']
+
+/**
+ * The version of package.json, which a pre-commit hook raises on every commit.
+ * Freezing it into the bundle is what makes a version bump reach the visitor:
+ * the precached files change, the service worker sees a new build, and the
+ * update banner offers it.
+ */
+const { version } = JSON.parse(
+  readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf8'),
+)
 
 const DEMO_DIR = process.env.DEMO ? `example/${process.env.DEMO}` : 'example'
 
@@ -56,6 +66,7 @@ export default defineConfig({
   // Set VITE_BASE at build time for a subdirectory deployment:
   //   VITE_BASE=/vitrines/augustins/ npm run build
   base: process.env.VITE_BASE ?? '/',
+  define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [
     vue(),
     tailwindcss(),

@@ -10,9 +10,9 @@ const { info, objectById } = useCollection()
 const route = useRoute()
 
 /**
- * On a record, the cover picture bleeds through the banner as a halftone
- * screen. The thumbnail is enough: the screen throws away most of the detail
- * anyway, and it is already in the browser's cache.
+ * On a record, the cover picture bleeds through the banner. The thumbnail is
+ * enough: the screen throws away most of the detail anyway, and it is already
+ * in the browser's cache.
  */
 const screened = computed(() => {
   if (route.name !== 'object' || typeof route.params.id !== 'string') return undefined
@@ -21,17 +21,15 @@ const screened = computed(() => {
 })
 
 /**
- * Browsing the collection is a long scroll, so on the list the banner follows
- * along — but halved and pinned, otherwise 270px of blue would eat the
- * viewport. A record is short and keeps the full banner, which scrolls away.
+ * Both the list and a record are long scrolls, so the banner follows along —
+ * but halved and pinned, otherwise 270px of blue would eat the viewport.
  */
-const scrolled = ref(false)
-const condensed = computed(() => scrolled.value && route.name === 'home')
+const condensed = ref(false)
 
 // A few pixels of slack, so the banner does not flip back and forth on the
 // elastic scroll of a trackpad.
 function readScroll() {
-  scrolled.value = window.scrollY > 24
+  condensed.value = window.scrollY > 24
 }
 
 onMounted(() => {
@@ -66,7 +64,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', readScroll))
         class="flex h-full px-4 transition-[padding,gap] duration-300 motion-reduce:transition-none sm:px-6"
         :class="
           condensed
-            ? 'flex-row-reverse items-center gap-4 py-[20px] delay-200'
+            ? 'flex-row-reverse items-center gap-4 py-[20px] delay-[400ms]'
             : 'flex-col py-6 delay-0'
         "
       >
@@ -81,11 +79,11 @@ onBeforeUnmount(() => window.removeEventListener('scroll', readScroll))
         >
           <!-- `text-balance` has to go when condensed: it would undo `truncate`. -->
           <h1
-            class="font-serif leading-tight transition-[font-size] duration-300 motion-reduce:transition-none"
+            class="font-serif leading-tight transition-[font-size] duration-[600ms] motion-reduce:transition-none"
             :class="
               condensed
                 ? 'truncate text-[0.9375rem] delay-0 sm:text-[1.125rem] md:text-[1.5rem]'
-                : 'text-3xl text-balance delay-200 sm:text-4xl md:text-5xl'
+                : 'text-3xl text-balance delay-[400ms] sm:text-4xl md:text-5xl'
             "
           >
             {{ info?.titre ?? t('app.title') }}
@@ -96,8 +94,8 @@ onBeforeUnmount(() => window.removeEventListener('scroll', readScroll))
           -->
           <p
             v-if="info?.description"
-            class="max-w-3xl text-white/80 transition-[font-size,line-height,margin-top] duration-300 motion-reduce:transition-none"
-            :class="condensed ? 'mt-1 truncate text-xs leading-none delay-0' : 'mt-3 delay-200'"
+            class="max-w-3xl text-white/80 transition-[font-size,line-height,margin-top] duration-[600ms] motion-reduce:transition-none"
+            :class="condensed ? 'mt-1 truncate text-xs leading-none delay-0' : 'mt-3 delay-[400ms]'"
           >
             {{ info.description }}
           </p>

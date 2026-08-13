@@ -3,11 +3,11 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { drawHalftone, loadScreenableImage, type HalftoneOptions } from '@/lib/halftone'
 
 /**
- * The dial of the effect: a fine screen keeps the printed grain while still
- * letting the motif read. `dotted: false` drops the screen altogether and lays
- * the picture down as a plain grey wash.
+ * The dial of the effect. A plain grey wash lets the motif read best, which is
+ * what the banner is after; `dotted: true` brings back the printed screen, at
+ * `step` pixels apart and `angle` degrees.
  */
-const SCREEN: HalftoneOptions = { step: 4, angle: 45, dotted: true }
+const SCREEN: HalftoneOptions = { dotted: false, step: 4, angle: 45 }
 
 /**
  * The record's picture, screened into the banner. It sits behind the title
