@@ -46,11 +46,12 @@
 }
 
 @utility header-gradient {
-  background: #17107a;
+  background: #0b064d;
   background: linear-gradient(
     180deg,
-    rgba(23, 16, 122, 1) 0%,
-    rgba(61, 52, 112, 0.92) 79%,
+    rgba(11, 6, 77, 1) 0%,
+    rgba(14, 8, 110, 0.92) 46%,
+    rgba(27, 20, 140, 0.88) 91%,
     rgba(42, 35, 176, 0.75) 100%
   );
 }
