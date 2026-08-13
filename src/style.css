@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 
 /*
- * Habillage volontairement sobre : l'image porte la page, le texte se tient en retrait.
- * Une passe de design suivra sur la base de cette première version.
+ * Deliberately plain styling: the image carries the page, the text stays back.
+ * A design pass will follow on top of this first version.
  */
 @theme {
   --font-serif:
@@ -26,7 +26,7 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Un anneau de focus visible et homogène, sans l'imposer au clic souris. */
+  /* A visible, consistent focus ring, without forcing it on mouse clicks. */
   :focus-visible {
     outline: 2px solid var(--color-stone-900);
     outline-offset: 2px;
@@ -39,6 +39,6 @@
   }
 }
 
-@utility lien-evitement {
+@utility skip-link {
   @apply sr-only rounded-md bg-stone-900 px-4 py-2 text-stone-50 focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50;
 }

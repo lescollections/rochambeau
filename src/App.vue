@@ -14,7 +14,7 @@ const { status } = useCollection()
 </script>
 
 <template>
-  <a href="#content" class="lien-evitement">{{ t('app.skip_to_content') }}</a>
+  <a href="#content" class="skip-link">{{ t('app.skip_to_content') }}</a>
 
   <AppHeader />
 

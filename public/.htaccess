@@ -1,0 +1,54 @@
+# Rochambeau — Apache configuration for a showcase served next to its data.
+#
+# Drop the contents of dist/ and the collection files (collection.json,
+# objets.ndjson, objets.csv, objets.xlsx) in the same directory.
+
+# --- Clean URLs -------------------------------------------------------------
+# The app uses the History API: /objet/D%201888%201 must return index.html,
+# while real files (assets, data, service worker) keep being served as-is.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # RewriteBase must match the deployment path, and the VITE_BASE used at build time.
+  RewriteBase /
+
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# --- MIME types -------------------------------------------------------------
+<IfModule mod_mime.c>
+  AddType application/x-ndjson .ndjson
+  AddType application/manifest+json .webmanifest
+  AddCharset UTF-8 .json .ndjson .csv
+</IfModule>
+
+# --- Compression ------------------------------------------------------------
+# NDJSON is highly compressible; this is what makes streaming a whole
+# collection cheap over the wire.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/csv application/javascript
+  AddOutputFilterByType DEFLATE application/json application/x-ndjson
+  AddOutputFilterByType DEFLATE image/svg+xml application/manifest+json
+</IfModule>
+
+# --- Caching ----------------------------------------------------------------
+<IfModule mod_headers.c>
+  # Fingerprinted assets never change under the same name.
+  <FilesMatch "\.(js|css|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Entry points and data must be revalidated, otherwise an export pass would
+  # stay invisible behind the browser cache.
+  <FilesMatch "^(index\.html|sw\.js|manifest\.webmanifest)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+
+  <FilesMatch "\.(json|ndjson|csv|xlsx)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>

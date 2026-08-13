@@ -6,72 +6,72 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 /**
- * En production, la vitrine est déposée à côté de ses données : l'app et
- * `collection.json` / `objets.ndjson` partagent le même répertoire servi par Apache.
- * En développement, les données de démonstration vivent dans `example/` ; ce plugin
- * les expose à la racine du serveur de dev pour que les chemins soient identiques
- * des deux côtés — aucune copie, aucune variable d'environnement supplémentaire.
+ * In production the showcase is deployed next to its data: the app and
+ * collection.json / objets.ndjson share the directory served by Apache.
+ * In development the demo data lives in example/, and this plugin exposes it at
+ * the dev server root so paths are identical on both sides — no copy, no extra
+ * environment variable.
  */
-const DONNEES_DEMO = ['collection.json', 'objets.ndjson', 'objets.csv', 'objets.xlsx']
+const DEMO_FILES = ['collection.json', 'objets.ndjson', 'objets.csv', 'objets.xlsx']
 
-const TYPES_MIME: Record<string, string> = {
+const MIME_TYPES: Record<string, string> = {
   '.json': 'application/json; charset=utf-8',
   '.ndjson': 'application/x-ndjson; charset=utf-8',
   '.csv': 'text/csv; charset=utf-8',
   '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 }
 
-function donneesExemple() {
+type DevMiddleware = (
+  request: { url?: string },
+  response: { setHeader: (name: string, value: string) => void },
+  next: () => void,
+) => void
+
+function serveDemoData() {
   return {
-    name: 'rochambeau:donnees-exemple',
+    name: 'rochambeau:demo-data',
     apply: 'serve' as const,
-    configureServer(serveur: { middlewares: { use: (fn: MiddlewareDev) => void } }) {
-      serveur.middlewares.use((req, res, next) => {
-        const chemin = (req.url ?? '').split('?')[0] ?? ''
-        const nom = chemin.replace(/^\//, '')
-        if (!DONNEES_DEMO.includes(nom)) return next()
+    configureServer(server: { middlewares: { use: (handler: DevMiddleware) => void } }) {
+      server.middlewares.use((request, response, next) => {
+        const path = (request.url ?? '').split('?')[0] ?? ''
+        const name = path.replace(/^\//, '')
+        if (!DEMO_FILES.includes(name)) return next()
 
-        const fichier = fileURLToPath(new URL(`./example/${nom}`, import.meta.url))
-        if (!existsSync(fichier)) return next()
+        const file = fileURLToPath(new URL(`./example/${name}`, import.meta.url))
+        if (!existsSync(file)) return next()
 
-        const extension = nom.slice(nom.lastIndexOf('.'))
-        res.setHeader('Content-Type', TYPES_MIME[extension] ?? 'application/octet-stream')
-        createReadStream(fichier).pipe(res)
+        const extension = name.slice(name.lastIndexOf('.'))
+        response.setHeader('Content-Type', MIME_TYPES[extension] ?? 'application/octet-stream')
+        createReadStream(file).pipe(response as unknown as NodeJS.WritableStream)
       })
     },
   }
 }
 
-type MiddlewareDev = (
-  req: { url?: string },
-  res: { setHeader: (nom: string, valeur: string) => void },
-  next: () => void,
-) => void
-
 export default defineConfig({
-  // Renseigner VITE_BASE au build pour un déploiement en sous-répertoire :
+  // Set VITE_BASE at build time for a subdirectory deployment:
   //   VITE_BASE=/vitrines/augustins/ npm run build
   base: process.env.VITE_BASE ?? '/',
   plugins: [
     vue(),
     tailwindcss(),
-    donneesExemple(),
+    serveDemoData(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.svg', 'icons/*.png'],
+      includeAssets: ['favicon.png', 'icons/*.png'],
       manifest: {
-        name: 'Rochambeau — vitrine de collection',
+        name: 'Rochambeau — collection showcase',
         short_name: 'Rochambeau',
-        description: 'Vitrine publique de collection',
+        description: 'Public showcase of a collection',
         lang: 'fr',
-        theme_color: '#1c1917',
+        theme_color: '#0e086e',
         background_color: '#fafaf9',
         display: 'standalone',
         icons: [
-          { src: 'icons/icone-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icons/icone-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
           {
-            src: 'icons/icone-512-masquable.png',
+            src: 'icons/icon-512-maskable.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
@@ -83,16 +83,16 @@ export default defineConfig({
         navigateFallbackDenylist: [/\.(?:json|ndjson|csv|xlsx)$/],
         runtimeCaching: [
           {
-            // Le manifeste et les objets : servis depuis le cache, rafraîchis en tâche de fond.
+            // Manifest and objects: served from cache, refreshed in the background.
             urlPattern: ({ url }: { url: URL }) => /\.(?:json|ndjson)$/.test(url.pathname),
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'rochambeau-donnees',
+              cacheName: 'rochambeau-data',
               expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
           },
           {
-            // Les images sont hébergées ailleurs : on les garde au fil de la consultation.
+            // Images are hosted elsewhere: keep them as the visitor browses.
             urlPattern: ({ request }: { request: Request }) => request.destination === 'image',
             handler: 'CacheFirst',
             options: {
