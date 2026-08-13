@@ -17,40 +17,62 @@ const caption = computed(() => {
   if (!props.captionField) return ''
   return flatten(props.object.champs[props.captionField])
 })
+
+/**
+ * Pictures are shown at their natural ratio, so the space is reserved up front
+ * from the dimensions carried by the format — no reflow as images arrive.
+ */
+const ratio = computed(() => {
+  const cover = props.object.cover
+  if (!cover?.l || !cover?.h) return undefined
+  return `${cover.l} / ${cover.h}`
+})
 </script>
 
 <template>
   <RouterLink
     :to="{ name: 'object', params: { id: object.id }, query: query ? { q: query } : undefined }"
-    class="group flex flex-col rounded-lg focus-visible:outline-offset-4"
+    class="group relative block overflow-hidden bg-stone-200/60 focus-visible:outline-offset-2 dark:bg-stone-800/60"
   >
-    <div
-      class="relative overflow-hidden rounded-md bg-stone-200/60 dark:bg-stone-800/60"
-      style="aspect-ratio: 4 / 5"
-    >
-      <img
-        v-if="object.cover"
-        :src="object.cover.apercu"
-        :alt="object.cover.legende ?? object.titre"
-        :width="object.cover.l"
-        :height="object.cover.h"
-        loading="lazy"
-        decoding="async"
-        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-      />
-      <span
-        v-else
-        class="absolute inset-0 flex items-center justify-center text-xs text-stone-400 dark:text-stone-500"
-      >
-        {{ t('list.no_image') }}
-      </span>
+    <img
+      v-if="object.cover"
+      :src="object.cover.apercu"
+      :alt="object.cover.legende ?? object.titre"
+      :width="object.cover.l"
+      :height="object.cover.h"
+      :style="ratio ? { aspectRatio: ratio } : undefined"
+      loading="lazy"
+      decoding="async"
+      class="block w-full"
+    />
+    <!-- Without a picture the caption is all there is, so it stays visible. -->
+    <div v-else class="flex aspect-4/5 items-center p-4">
+      <div>
+        <p class="font-serif leading-snug">
+          <HighlightedText :text="object.titre" :query="query" />
+        </p>
+        <p v-if="caption" class="mt-1 text-sm text-stone-500 dark:text-stone-400">
+          <HighlightedText :text="caption" :query="query" />
+        </p>
+        <p class="mt-2 text-xs text-stone-400 dark:text-stone-500">{{ t('list.no_image') }}</p>
+      </div>
     </div>
 
-    <p class="mt-2 font-serif leading-snug group-hover:underline">
-      <HighlightedText :text="object.titre" :query="query" />
-    </p>
-    <p v-if="caption" class="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
-      <HighlightedText :text="caption" :query="query" />
-    </p>
+    <!--
+      Hover-only information would be unreachable on touch screens and by
+      keyboard: it also shows on focus, and stays visible where hovering does
+      not exist.
+    -->
+    <div
+      v-if="object.cover"
+      class="absolute inset-x-0 bottom-0 translate-y-full bg-black p-3 text-white transition-transform duration-200 group-hover:translate-y-0 group-focus-visible:translate-y-0 motion-reduce:transition-none pointer-coarse:translate-y-0"
+    >
+      <p class="font-serif leading-snug">
+        <HighlightedText :text="object.titre" :query="query" />
+      </p>
+      <p v-if="caption" class="mt-0.5 text-sm text-white/70">
+        <HighlightedText :text="caption" :query="query" />
+      </p>
+    </div>
   </RouterLink>
 </template>

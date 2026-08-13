@@ -65,7 +65,7 @@ export default defineConfig({
         description: 'Public showcase of a collection',
         lang: 'fr',
         theme_color: '#0e086e',
-        background_color: '#fafaf9',
+        background_color: '#faf7f1',
         display: 'standalone',
         icons: [
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },

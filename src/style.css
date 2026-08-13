@@ -8,6 +8,12 @@
   --font-serif:
     'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, Palatino, 'Times New Roman',
     serif;
+
+  /* Rochambeau blue, taken from the logo. */
+  --color-brand: #0e086e;
+
+  /* Warm off-white the pages sit on. */
+  --color-paper: #faf7f1;
 }
 
 @layer base {
@@ -37,6 +43,16 @@
       outline-color: var(--color-stone-100);
     }
   }
+}
+
+@utility header-gradient {
+  background: #17107a;
+  background: linear-gradient(
+    180deg,
+    rgba(23, 16, 122, 1) 0%,
+    rgba(61, 52, 112, 0.92) 79%,
+    rgba(42, 35, 176, 0.75) 100%
+  );
 }
 
 @utility skip-link {

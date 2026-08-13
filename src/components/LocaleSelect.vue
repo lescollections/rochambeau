@@ -12,10 +12,11 @@ function onChange(event: Event) {
     <span class="sr-only">{{ t('locale.label') }}</span>
     <select
       :value="locale"
-      class="cursor-pointer rounded-md border border-stone-300 bg-transparent px-2 py-1 text-sm dark:border-stone-700"
+      class="cursor-pointer rounded-md border border-white/40 bg-transparent px-2 py-1 text-sm text-white"
       @change="onChange"
     >
-      <option v-for="code in LOCALES" :key="code" :value="code">
+      <!-- Options are drawn by the OS: they need their own readable colours. -->
+      <option v-for="code in LOCALES" :key="code" :value="code" class="bg-white text-stone-900">
         {{ t(`locale.${code}`) }}
       </option>
     </select>

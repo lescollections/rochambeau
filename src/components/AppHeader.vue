@@ -9,24 +9,28 @@ const route = useRoute()
 </script>
 
 <template>
-  <header
-    class="sticky top-0 z-30 border-b border-stone-200 bg-stone-50/90 backdrop-blur-sm dark:border-stone-800 dark:bg-stone-950/90"
-  >
-    <div class="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
+  <!--
+    A 270px banner cannot stay pinned while scrolling without eating the
+    viewport, so the header scrolls away with the page.
+  -->
+  <header class="header-gradient h-[270px] text-white">
+    <div class="flex h-full flex-col px-4 py-6 sm:px-6">
+      <div class="flex justify-end">
+        <LocaleSelect />
+      </div>
+
       <!-- Coming back from a record keeps the search term the visitor typed. -->
       <RouterLink
         :to="{ name: 'home', query: route.query.q ? { q: route.query.q } : undefined }"
-        class="min-w-0 flex-1 rounded-sm"
+        class="flex min-h-0 flex-1 flex-col justify-center rounded-sm"
       >
-        <p class="truncate font-serif text-lg leading-tight sm:text-xl">
+        <h1 class="font-serif text-3xl leading-tight text-balance sm:text-4xl md:text-5xl">
           {{ info?.titre ?? t('app.title') }}
-        </p>
-        <p v-if="info?.description" class="mt-0.5 truncate text-sm text-stone-500 dark:text-stone-400">
+        </h1>
+        <p v-if="info?.description" class="mt-3 max-w-3xl text-white/70">
           {{ info.description }}
         </p>
       </RouterLink>
-
-      <LocaleSelect />
     </div>
   </header>
 </template>

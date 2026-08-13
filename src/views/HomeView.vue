@@ -51,7 +51,7 @@ const captionField = computed(() => fields.value.find((field) => field.facette)?
 </script>
 
 <template>
-  <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6">
+  <div class="px-4 py-6 sm:px-6">
     <SearchBar v-model="query" />
 
     <p class="mt-4 text-sm text-stone-500 dark:text-stone-400" aria-live="polite">
@@ -66,11 +66,16 @@ const captionField = computed(() => fields.value.find((field) => field.facette)?
       <p class="mt-2 text-sm text-stone-500 dark:text-stone-400">{{ t('search.empty_hint') }}</p>
     </div>
 
+    <!--
+      Masonry through CSS columns: pictures keep their own height, and the
+      column count is pinned per width band rather than derived from a column
+      width. Beware that reading order becomes column by column, not row by row.
+    -->
     <ul
       v-else
-      class="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+      class="mt-6 columns-3 gap-4 min-[800px]:columns-4 min-[1200px]:columns-6 min-[1600px]:columns-8"
     >
-      <li v-for="object in results" :key="object.id">
+      <li v-for="object in results" :key="object.id" class="mb-4 break-inside-avoid">
         <ObjectCard :object="object" :query="query" :caption-field="captionField" />
       </li>
     </ul>

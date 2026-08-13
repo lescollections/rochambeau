@@ -1,6 +1,7 @@
 import { computed, readonly, ref, shallowRef } from 'vue'
 import type { Field, IndexedObject, Manifest } from '@/types'
 import { loadManifest, loadObjects } from '@/lib/loader'
+import { shuffle } from '@/lib/shuffle'
 import { suggestLocale } from '@/lib/i18n'
 
 /**
@@ -50,7 +51,9 @@ export function load(force = false): Promise<void> {
         },
       })
 
-      objects.value = Object.freeze(list)
+      // Display order is drawn at random, so the same collection is discovered
+      // differently on each visit. `rank` still carries the catalogue order.
+      objects.value = Object.freeze(shuffle(list))
       received.value = list.length
       status.value = 'ready'
     } catch (cause) {

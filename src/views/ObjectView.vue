@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useCollection } from '@/composables/useCollection'
 import { flatten } from '@/lib/text'
+import { editorialCaption } from '@/lib/caption'
 import { formatNumber, t } from '@/lib/i18n'
 import ImageViewer from '@/components/ImageViewer.vue'
 
@@ -85,7 +86,8 @@ watch(
         </div>
       </div>
 
-      <div class="md:sticky md:top-24 md:self-start">
+      <!-- The header no longer sticks, so the offset is just breathing room. -->
+      <div class="md:sticky md:top-6 md:self-start">
         <h1 class="font-serif text-2xl leading-tight text-balance">{{ object.titre }}</h1>
 
         <dl class="mt-6 space-y-3 text-sm">
@@ -104,48 +106,51 @@ watch(
             <dd class="col-span-2">{{ object.credit }}</dd>
           </div>
         </dl>
-
-        <nav
-          v-if="context.position !== -1"
-          class="mt-8 flex items-center justify-between gap-4 border-t border-stone-200 pt-4 text-sm dark:border-stone-800"
-        >
-          <RouterLink
-            v-if="context.previous"
-            :to="{ name: 'object', params: { id: context.previous.id }, query: route.query }"
-            class="max-w-[45%] truncate text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
-            :title="context.previous.titre"
-          >
-            ← {{ t('object.previous') }}
-          </RouterLink>
-          <span v-else />
-
-          <span class="shrink-0 text-xs tabular-nums text-stone-400 dark:text-stone-500">
-            {{
-              t('object.position', {
-                position: formatNumber(context.position + 1),
-                total: formatNumber(objects.length),
-              })
-            }}
-          </span>
-
-          <RouterLink
-            v-if="context.next"
-            :to="{ name: 'object', params: { id: context.next.id }, query: route.query }"
-            class="max-w-[45%] truncate text-right text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
-            :title="context.next.titre"
-          >
-            {{ t('object.next') }} →
-          </RouterLink>
-          <span v-else />
-        </nav>
       </div>
     </article>
+
+    <!-- Browsing spans the whole record, so it sits under both columns. -->
+    <nav
+      v-if="object && context.position !== -1"
+      class="mt-10 flex items-center justify-between gap-4 border-t border-stone-200 pt-4 text-sm dark:border-stone-800"
+    >
+      <RouterLink
+        v-if="context.previous"
+        :to="{ name: 'object', params: { id: context.previous.id }, query: route.query }"
+        class="max-w-[45%] truncate text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
+        :title="context.previous.titre"
+      >
+        ← {{ t('object.previous') }}
+      </RouterLink>
+      <span v-else />
+
+      <span class="shrink-0 text-xs tabular-nums text-stone-400 dark:text-stone-500">
+        {{
+          t('object.position', {
+            position: formatNumber(context.position + 1),
+            total: formatNumber(objects.length),
+          })
+        }}
+      </span>
+
+      <RouterLink
+        v-if="context.next"
+        :to="{ name: 'object', params: { id: context.next.id }, query: route.query }"
+        class="max-w-[45%] truncate text-right text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
+        :title="context.next.titre"
+      >
+        {{ t('object.next') }} →
+      </RouterLink>
+      <span v-else />
+    </nav>
 
     <ImageViewer
       v-if="object"
       :pictures="object.images"
       :index="openPicture"
       :title="object.titre"
+      :caption="editorialCaption(object)"
+      :credit="object.credit"
       @close="openPicture = null"
       @navigate="openPicture = $event"
     />

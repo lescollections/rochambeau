@@ -8,6 +8,10 @@ const props = defineProps<{
   /** Index of the displayed picture; null closes the viewer. */
   index: number | null
   title: string
+  /** Editorial caption shown under the picture. */
+  caption?: string
+  /** Photographic credit, kept distinct from the caption. */
+  credit?: string
 }>()
 
 const emit = defineEmits<{
@@ -94,7 +98,8 @@ function onBackdropClick(event: MouseEvent) {
         </div>
       </div>
 
-      <div class="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-4">
+      <figure class="m-0 flex min-h-0 flex-1 flex-col">
+        <div class="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-4">
         <img
           :src="picture.plein"
           :alt="picture.legende ?? title"
@@ -139,9 +144,15 @@ function onBackdropClick(event: MouseEvent) {
         </button>
       </div>
 
-      <p v-if="picture.legende" class="px-4 pb-4 text-center text-sm text-stone-300">
-        {{ picture.legende }}
-      </p>
+      <figcaption class="mx-auto max-w-4xl px-4 pb-5 text-center">
+        <p v-if="caption" class="text-sm text-stone-200">{{ caption }}</p>
+        <!-- Only worth showing when it says more than the title already does. -->
+        <p v-if="picture.legende && picture.legende !== title" class="mt-1 text-sm text-stone-400">
+          {{ picture.legende }}
+        </p>
+        <p v-if="credit" class="mt-1 text-xs text-stone-500">{{ credit }}</p>
+        </figcaption>
+      </figure>
     </div>
   </dialog>
 </template>
