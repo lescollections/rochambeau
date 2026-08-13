@@ -56,10 +56,10 @@ const ratio = computed(() => {
         <p class="font-serif leading-snug">
           <HighlightedText :text="object.titre" :query="query" />
         </p>
-        <p v-if="caption" class="mt-1 text-sm text-stone-700">
+        <p v-if="caption" class="mt-1 text-sm text-stone-800">
           <HighlightedText :text="caption" :query="query" />
         </p>
-        <p class="mt-2 text-xs text-stone-600">{{ t('list.no_image') }}</p>
+        <p class="mt-2 text-xs text-stone-800">{{ t('list.no_image') }}</p>
       </div>
     </div>
 

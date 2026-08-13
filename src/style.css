@@ -65,16 +65,28 @@
   );
 }
 
+@utility brand-chip {
+  /*
+   * Derived from the main colour rather than picked next to it: the day this
+   * becomes a per-showcase setting, the chip follows on its own. Only the
+   * lightness is pushed — the hue and the chroma of the brand are kept, and
+   * the plain colour stands as a fallback for browsers without relative
+   * colours.
+   */
+  background-color: var(--color-brand);
+  background-color: oklch(from var(--color-brand) calc(l + 0.18) c h);
+}
+
 @utility no-picture-gradient {
-  background: linear-gradient(
-    180deg,
-    #efeefe 0%,
-    #dadada 16.667%,
-    #cacaca 33.333%,
-    #cbcbcb 50%,
-    #bfbfbf 66.667%,
-    #b2b2b2 75%,
-    #a3a3a3 100%
+  /*
+   * The tint is the main colour at 12%, so it follows a future setting too.
+   * It fades to transparent, hence the opaque ground underneath: without it
+   * the dark theme would show through the lower half and swallow the type.
+   */
+  background-color: #efeefe;
+  background-image: linear-gradient(
+    #efeefe 0,
+    color-mix(in oklab, var(--color-brand) 12%, transparent) 80.667%
   );
 }
 

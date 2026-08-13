@@ -17,7 +17,7 @@ const domain = computed(() => (info.value?.slug ? `${info.value.slug}.lescollect
       <p class="flex flex-wrap gap-x-3">
         <span v-if="domain" class="flex items-center gap-2 text-stone-700 dark:text-stone-300">
           <!-- A chip of the banner blue, tying the footer back to the header. -->
-          <span aria-hidden="true" class="size-[10px] shrink-0 bg-brand" />
+          <span aria-hidden="true" class="brand-chip size-[10px] shrink-0" />
           {{ domain }}
         </span>
         <span>{{ t('footer.objects', { n: objects.length }) }}</span>
