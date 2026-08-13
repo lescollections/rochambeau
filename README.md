@@ -46,7 +46,8 @@ repository, so each clone activates them once:
 git config core.hooksPath .githooks
 ```
 
-The version is frozen into the bundle as `__APP_VERSION__`, shown in the footer. That is what
+The version is frozen into the bundle as `__APP_VERSION__` and logged to the console at startup
+— never shown on screen, but it has to reach the bundle to survive tree-shaking. That is what
 makes a bump reach the visitor: the precached files change, the service worker sees a new build,
 and the update banner offers it — a code change alone would do the same, but a version bump makes
 it deliberate. Amending a commit runs the hook again, so amend with `--no-verify`. The dev server
@@ -103,7 +104,7 @@ See [interface.md](https://github.com/lescollections/rochambeau/blob/main/docume
 
 # Rochambeau
 
-![img](documentation/french.png) French, US English version at the top
+![img](documentation/french.png) Français ici, version US en haut de ce readme.
 
 Rochambeau est une application PWA, une interface publique destinée à la présentation des collections, qui s'appuie sur un plugin d'exportation pour CollectiveAccess.
 
@@ -144,8 +145,10 @@ versionnés dans le dépôt, chaque clone les active une fois :
 git config core.hooksPath .githooks
 ```
 
-La version est figée dans le bundle sous `__APP_VERSION__` et affichée dans le pied de page.
-C'est ce qui fait qu'une incrémentation atteint le visiteur : les fichiers préchargés changent,
+La version est figée dans le bundle sous `__APP_VERSION__` et écrite dans la console au
+démarrage — jamais affichée à l'écran, mais elle doit atteindre le bundle pour survivre au
+tree-shaking. C'est ce qui fait qu'une incrémentation atteint le visiteur : les fichiers
+préchargés changent,
 le service worker voit une nouvelle version et le bandeau de mise à jour la propose — une
 modification de code produirait le même effet, mais l'incrément le rend délibéré. Un
 `git commit --amend` rejoue le hook : amender avec `--no-verify`. Le serveur de développement lit
