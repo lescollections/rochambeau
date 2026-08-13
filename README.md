@@ -56,6 +56,10 @@ collection in the `lescollections-vitrine/1` format renders as-is.
 Images are never bundled: they are referenced by URL and cached by the service worker as the
 visitor browses.
 
+## Screen captures of the interface
+
+See [interface.md](https://github.com/lescollections/rochambeau/blob/main/documentation/interface.md)
+
 ---
 
 # Rochambeau
@@ -115,3 +119,7 @@ aucun nom de champ n'est écrit en dur, donc toute collection au format
 
 Les images ne sont jamais empaquetées : elles sont référencées par URL et mises en cache par le
 service worker au fil de la consultation.
+
+## Captures d'écran de l'interface
+
+Voir [documentation/interface.md](https://github.com/lescollections/rochambeau/blob/main/documentation/interface.md)
