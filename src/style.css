@@ -67,14 +67,14 @@
 
 @utility no-picture-gradient {
   background: linear-gradient(
-    90deg,
+    180deg,
     #efeefe 0%,
-    #e5de5d 16.667%,
-    #dacdac 33.333%,
-    #cfbcfb 50%,
-    #c4ac4a 66.667%,
-    #b99b99 83.333%,
-    #af8af8 100%
+    #dadada 16.667%,
+    #cacaca 33.333%,
+    #cbcbcb 50%,
+    #bfbfbf 66.667%,
+    #b2b2b2 75%,
+    #a3a3a3 100%
   );
 }
 
