@@ -17,3 +17,8 @@ dist-ssr/
 # Logs
 npm-debug.log*
 yarn-error.log*
+
+# Python virtualenv for the demo-data scripts
+.venv/
+__pycache__/
+*.pyc

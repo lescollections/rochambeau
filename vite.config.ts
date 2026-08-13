@@ -9,10 +9,14 @@ import { VitePWA } from 'vite-plugin-pwa'
  * In production the showcase is deployed next to its data: the app and
  * collection.json / objets.ndjson share the directory served by Apache.
  * In development the demo data lives in example/, and this plugin exposes it at
- * the dev server root so paths are identical on both sides — no copy, no extra
- * environment variable.
+ * the dev server root so paths are identical on both sides — no copy needed.
+ *
+ * Another set can be served from a subdirectory of example/:
+ *   DEMO=cleveland npm run dev
  */
 const DEMO_FILES = ['collection.json', 'objets.ndjson', 'objets.csv', 'objets.xlsx']
+
+const DEMO_DIR = process.env.DEMO ? `example/${process.env.DEMO}` : 'example'
 
 const MIME_TYPES: Record<string, string> = {
   '.json': 'application/json; charset=utf-8',
@@ -37,7 +41,7 @@ function serveDemoData() {
         const name = path.replace(/^\//, '')
         if (!DEMO_FILES.includes(name)) return next()
 
-        const file = fileURLToPath(new URL(`./example/${name}`, import.meta.url))
+        const file = fileURLToPath(new URL(`./${DEMO_DIR}/${name}`, import.meta.url))
         if (!existsSync(file)) return next()
 
         const extension = name.slice(name.lastIndexOf('.'))

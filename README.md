@@ -32,6 +32,25 @@ npm run typecheck
 In development, the files from `example/` (`collection.json`, `objets.ndjson`, `objets.csv`,
 `objets.xlsx`) are served at the server root, exactly where the app expects them in production.
 
+### Demo sets
+
+`example/` holds the Toulouse set (108 works, 40 of them without a picture). `example/cleveland/`
+holds a load-testing set of 2,500 CC0 works from the Cleveland Museum of Art, all with pictures —
+the ceiling of the lescollections.fr plans. Serve either one:
+
+```sh
+npm run dev                    # Toulouse, 108 works
+DEMO=cleveland npm run dev     # Cleveland, 2 500 works
+```
+
+The Cleveland set is regenerated with `python3 scripts/fetch-cleveland.py [count]`. The script
+needs no dependency, but picks up `openpyxl` when it is available to produce a nicer workbook:
+
+```sh
+python3 -m venv .venv && .venv/bin/pip install openpyxl
+.venv/bin/python3 scripts/fetch-cleveland.py 2500
+```
+
 ## Deployment
 
 A showcase is the contents of `dist/` plus the collection files, side by side in one directory
@@ -94,6 +113,26 @@ npm run typecheck
 
 En développement, les fichiers d'`example/` (`collection.json`, `objets.ndjson`, `objets.csv`,
 `objets.xlsx`) sont servis à la racine, exactement là où l'application les attend en production.
+
+### Jeux de démonstration
+
+`example/` contient le jeu toulousain (108 œuvres, dont 40 sans image). `example/cleveland/`
+contient un jeu de montée en charge : 2 500 œuvres CC0 du Cleveland Museum of Art, toutes avec
+image — le plafond des formules de lescollections.fr. Pour servir l'un ou l'autre :
+
+```sh
+npm run dev                    # Toulouse, 108 œuvres
+DEMO=cleveland npm run dev     # Cleveland, 2 500 œuvres
+```
+
+Le jeu Cleveland se régénère avec `python3 scripts/fetch-cleveland.py [nombre]`. Le script ne
+requiert aucune dépendance, mais utilise `openpyxl` s'il est disponible pour produire un
+classeur plus soigné :
+
+```sh
+python3 -m venv .venv && .venv/bin/pip install openpyxl
+.venv/bin/python3 scripts/fetch-cleveland.py 2500
+```
 
 ## Déploiement
 

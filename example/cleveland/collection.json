@@ -1,0 +1,69 @@
+{
+  "format": "lescollections-vitrine/1",
+  "genere_le": "2026-08-13T06:51:23Z",
+  "collection": {
+    "slug": "cleveland",
+    "titre": "Cleveland Museum of Art — open access selection",
+    "description": "Load-testing set — 2500 CC0 artworks, all with pictures.",
+    "langue": "en",
+    "nb_objets": 2500
+  },
+  "champs": [
+    {
+      "code": "denomination",
+      "libelle": "Object type",
+      "type": "texte"
+    },
+    {
+      "code": "auteur",
+      "libelle": "Artist",
+      "type": "texte",
+      "facette": true
+    },
+    {
+      "code": "datation",
+      "libelle": "Date",
+      "type": "texte",
+      "facette": true
+    },
+    {
+      "code": "domaine",
+      "libelle": "Department",
+      "type": "texte",
+      "facette": true
+    },
+    {
+      "code": "culture",
+      "libelle": "Culture",
+      "type": "texte",
+      "facette": true
+    },
+    {
+      "code": "materiaux",
+      "libelle": "Materials",
+      "type": "texte"
+    },
+    {
+      "code": "technique",
+      "libelle": "Technique",
+      "type": "texte"
+    },
+    {
+      "code": "dimensions",
+      "libelle": "Dimensions",
+      "type": "texte"
+    },
+    {
+      "code": "provenance",
+      "libelle": "Credit line",
+      "type": "texte"
+    },
+    {
+      "code": "localisation",
+      "libelle": "Location",
+      "type": "texte",
+      "facette": true
+    }
+  ],
+  "objets": "objets.ndjson"
+}
