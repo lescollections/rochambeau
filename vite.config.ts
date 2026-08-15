@@ -95,7 +95,18 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,woff2}'],
-        navigateFallbackDenylist: [/\.(?:json|ndjson|csv|xlsx)$/],
+        // ⚠️ `/gestion` DOIT ÊTRE EXCLU, et ce n'est pas une précaution théorique.
+        // La vitrine et l'atelier de catalogage partagent le MÊME hôte
+        // (`<slug>.lescollections.fr` : la racine sert la vitrine, `/gestion` sert
+        // Providence). Sans cette exclusion, le service worker — dont la portée est
+        // l'origine entière — répond à toute navigation par la coquille de la SPA, y
+        // compris vers `/gestion`. L'abonné qui clique « gérer ma collection » obtient
+        // alors « Cette œuvre est introuvable », depuis le cache, sans jamais atteindre
+        // son atelier. Constaté en production le 2026-08-15 sur exemple-toulouse.
+        //
+        // Un vidage de cache masque le symptôme et ne corrige rien : le service worker se
+        // réinstalle à la visite suivante de la vitrine.
+        navigateFallbackDenylist: [/\.(?:json|ndjson|csv|xlsx)$/, /^\/gestion(\/|$)/],
         runtimeCaching: [
           {
             // Manifest and objects: served from cache, refreshed in the background.
