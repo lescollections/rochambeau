@@ -32,6 +32,15 @@ const MESSAGES: Record<Locale, Messages> = {
     'search.empty': 'Aucune œuvre ne correspond à cette recherche.',
     'search.empty_hint': 'Essayez avec moins de mots, ou une autre orthographe.',
 
+    'filters.label': 'Filtrer par',
+    'filters.all': 'Indifférent',
+    'filters.clear': 'effacer tous les filtres',
+    'filters.chosen': 'Indifférent | 1 valeur | {n} valeurs',
+    'filters.no_match': 'Aucune valeur ne correspond',
+    'filters.add': 'ajouter un filtre',
+    'filters.show': 'voir les filtres en cours',
+    'filters.hide': 'masquer les filtres',
+
     'list.results': 'Aucune œuvre | {n} œuvre | {n} œuvres',
     'list.of_total': 'sur {total}',
     'list.no_image': 'Sans image',
@@ -79,6 +88,15 @@ const MESSAGES: Record<Locale, Messages> = {
     'search.clear': 'Clear search',
     'search.empty': 'No work matches this search.',
     'search.empty_hint': 'Try fewer words, or a different spelling.',
+
+    'filters.label': 'Filter by',
+    'filters.all': 'Any',
+    'filters.clear': 'remove all filters',
+    'filters.chosen': 'Any | 1 value | {n} values',
+    'filters.no_match': 'No matching value',
+    'filters.add': 'add a filter',
+    'filters.show': 'show current filters',
+    'filters.hide': 'hide the filters',
 
     'list.results': 'No work | {n} work | {n} works',
     'list.of_total': 'of {total}',

@@ -1,6 +1,6 @@
 {
   "name": "rochambeau",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": true,
   "type": "module",
   "description": "Vitrine publique PWA pour collections au format lescollections-vitrine/1",

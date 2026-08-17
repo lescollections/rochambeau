@@ -3,8 +3,11 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCollection } from '@/composables/useCollection'
 import { search } from '@/lib/search'
+import { applyFilters, buildFacets, filterableFields, FILTER_PREFIX, isEmpty } from '@/lib/facets'
+import type { Selection } from '@/lib/facets'
 import { formatNumber, t } from '@/lib/i18n'
 import SearchBar from '@/components/SearchBar.vue'
+import FacetFilters from '@/components/FacetFilters.vue'
 import ObjectCard from '@/components/ObjectCard.vue'
 
 const route = useRoute()
@@ -44,7 +47,70 @@ function withoutQuery() {
   return rest
 }
 
-const results = computed(() => search(objects.value, query.value))
+/**
+ * The filters live in the URL too, a "f.<code>" parameter per ticked value.
+ * Unlike the query they are written straight away: ticking is a deliberate
+ * choice, not a stream of keystrokes.
+ */
+const selection = computed<Selection>(() => {
+  const chosen: Record<string, string[]> = {}
+  for (const [key, value] of Object.entries(route.query)) {
+    if (!key.startsWith(FILTER_PREFIX)) continue
+    const values = (Array.isArray(value) ? value : [value]).filter(
+      (single): single is string => typeof single === 'string' && single !== '',
+    )
+    if (values.length > 0) chosen[key.slice(FILTER_PREFIX.length)] = values
+  }
+  return chosen
+})
+
+/** Ticks or unticks one value; an empty value clears the whole field. */
+function toggleFilter(code: string, value: string) {
+  const key = FILTER_PREFIX + code
+  const current = selection.value[code] ?? []
+  const next = { ...route.query }
+
+  const values = value
+    ? current.includes(value)
+      ? current.filter((chosen) => chosen !== value)
+      : [...current, value]
+    : []
+
+  if (values.length > 0) next[key] = [...values]
+  else delete next[key]
+
+  void router.replace({ query: next })
+}
+
+function clearFilters() {
+  const next = { ...route.query }
+  for (const key of Object.keys(next)) {
+    if (key.startsWith(FILTER_PREFIX)) delete next[key]
+  }
+  void router.replace({ query: next })
+}
+
+const searched = computed(() => search(objects.value, query.value))
+const results = computed(() => applyFilters(searched.value, selection.value))
+
+// Which fields deserve a dropdown is a property of the collection, not of the
+// current search: the row of filters must not appear and vanish as one types.
+const filterable = computed(() => filterableFields(objects.value, fields.value))
+const facets = computed(() => buildFacets(searched.value, filterable.value, selection.value))
+
+const filtering = computed(() => !isEmpty(selection.value))
+
+/**
+ * The row of dropdowns stays folded until asked for: the visitor comes for the
+ * pictures, and a wall of selects above them would say otherwise. A shared link
+ * carrying filters opens folded too, its wording saying what is already at work.
+ */
+const showFilters = ref(false)
+
+const filtersLabel = computed(() => {
+  if (showFilters.value) return t('filters.hide')
+  return filtering.value ? t('filters.show') : t('filters.add')
+})
 
 /**
  * Card whose caption is showing, where a tap replaces hovering. Only one at a
@@ -73,12 +139,48 @@ const captionField = computed(() => fields.value.find((field) => field.facette)?
   <div class="px-4 py-6 sm:px-6">
     <SearchBar v-model="query" />
 
-    <p class="mt-4 text-sm text-stone-500 dark:text-stone-400" aria-live="polite">
-      {{ t('list.results', { n: results.length }) }}
-      <template v-if="query">
-        {{ t('list.of_total', { total: formatNumber(total) }) }}
+    <p class="mt-4 text-sm text-stone-500 dark:text-stone-400">
+      <span aria-live="polite">
+        {{ t('list.results', { n: results.length }) }}
+        <template v-if="query || filtering">
+          {{ t('list.of_total', { total: formatNumber(total) }) }}
+        </template>
+      </span>
+
+      <template v-if="facets.length">
+        —
+        <button
+          type="button"
+          class="underline underline-offset-4 hover:text-stone-900 dark:hover:text-stone-100"
+          :aria-expanded="showFilters"
+          aria-controls="collection-filters"
+          @click="showFilters = !showFilters"
+        >
+          {{ filtersLabel }}
+        </button>
+      </template>
+
+      <!-- Undoing everything at once belongs on this line rather than under the
+           dropdowns, where it would push the works further down. -->
+      <template v-if="showFilters && filtering">
+        —
+        <button
+          type="button"
+          class="underline underline-offset-4 hover:text-stone-900 dark:hover:text-stone-100"
+          @click="clearFilters"
+        >
+          {{ t('filters.clear') }}
+        </button>
       </template>
     </p>
+
+    <FacetFilters
+      v-if="showFilters"
+      id="collection-filters"
+      :facets="facets"
+      :selection="selection"
+      @toggle="toggleFilter"
+    />
 
     <div v-if="results.length === 0" class="py-20 text-center">
       <p class="font-serif text-lg">{{ t('search.empty') }}</p>
