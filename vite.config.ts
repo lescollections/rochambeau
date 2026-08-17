@@ -118,12 +118,16 @@ export default defineConfig({
             },
           },
           {
-            // Images are hosted elsewhere: keep them as the visitor browses.
+            // Images sont servies par le proxy (<slug>.lescollections.fr/media/…) avec
+            // Cache-Control: max-age=86400 : une dépublication doit disparaître sous 24 h.
+            // StaleWhileRevalidate sert le cache immédiatement puis revalide en tâche de
+            // fond, et l'expiration à 1 jour aligne le service worker sur le proxy — au
+            // lieu des 60 jours de CacheFirst qui auraient gardé une image dépubliée.
             urlPattern: ({ request }: { request: Request }) => request.destination === 'image',
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'rochambeau-images',
-              expiration: { maxEntries: 600, maxAgeSeconds: 60 * 60 * 24 * 60 },
+              expiration: { maxEntries: 600, maxAgeSeconds: 60 * 60 * 24 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },
