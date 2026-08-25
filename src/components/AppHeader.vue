@@ -9,14 +9,23 @@ const { info, objectById } = useCollection()
 const route = useRoute()
 
 /**
- * On a record, the cover picture bleeds through the banner. The thumbnail is
- * enough: the screen throws away most of the detail anyway, and it is already
- * in the browser's cache.
+ * On a record, the cover picture bleeds through the banner.
+ *
+ * The thumbnail is NOT enough, which is the opposite of what this said until
+ * 2026-08-25. `apercu` is a bounding box: on a portrait it is about 115px wide,
+ * and the banner is the full width of the window. The screen throws away detail
+ * — it does not invent any — so a 115px source stretched over 1400px gives
+ * blocks of four to twelve pixels each, and the halftone reads as a mosaic of
+ * squares rather than as a relief. `moyen` is 600px at a fixed width, which is
+ * the same order as the halftone's own 4px step at that scale.
+ *
+ * The fallback chain is the format's: `moyen` is optional, `apercu` may equal
+ * `plein`, and a banner with no picture at all stays a plain gradient.
  */
 const screened = computed(() => {
   if (route.name !== 'object' || typeof route.params.id !== 'string') return undefined
   const cover = objectById(route.params.id)?.cover
-  return cover?.apercu ?? cover?.plein
+  return cover?.moyen ?? cover?.apercu ?? cover?.plein
 })
 
 /**

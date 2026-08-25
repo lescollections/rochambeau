@@ -53,6 +53,47 @@ const ratio = computed(() => {
   if (!cover?.l || !cover?.h) return undefined
   return `${cover.l} / ${cover.h}`
 })
+
+/**
+ * Two candidates, and only two — the ones whose width the format states.
+ *
+ * `apercu` is a bounding box, so its width depends on the orientation of the
+ * photograph and the format never says what it is: on the demonstration set,
+ * two thirds of the works are portraits and their `apercu` is 115px wide for a
+ * column of about 195px. It cannot carry a `w` descriptor without lying, so it
+ * stays where it was, as the plain `src` of a card that has nothing better.
+ *
+ * `moyen` is optional: a collection published before 2026-08-25 has none, and
+ * then this falls back to exactly what it used to do.
+ */
+const srcset = computed(() => {
+  const cover = props.object.cover
+  if (!cover?.moyen || !cover.moyen_l) return undefined
+  const candidates = [`${cover.moyen} ${cover.moyen_l}w`]
+  // `plein` earns its place only above the width `moyen` already covers —
+  // otherwise a screen at twice the density would be offered the same picture
+  // twice and the widest wins for nothing.
+  if (cover.l && cover.l > cover.moyen_l) candidates.push(`${cover.plein} ${cover.l}w`)
+  return candidates.join(', ')
+})
+
+/**
+ * The mosaic is CSS columns, so a card is exactly one column wide. The count is
+ * pinned per width band (HomeView), the gap is `gap-4` = 1rem, and the page is
+ * padded by `px-4`/`sm:px-6` — 2rem is used for every band, which overstates the
+ * column slightly above 640px. That is the safe direction to be wrong in: too
+ * wide picks the larger candidate, too narrow would upscale.
+ *
+ * ⚠️ These four bands must be read together with the `columns-*` classes of
+ * HomeView. Changing one without the other silently serves the wrong size —
+ * nothing breaks, the pictures just get soft.
+ */
+const SIZES = [
+  '(min-width: 1600px) calc((100vw - 9rem) / 8)',
+  '(min-width: 1200px) calc((100vw - 7rem) / 6)',
+  '(min-width: 800px) calc((100vw - 5rem) / 4)',
+  'calc((100vw - 4rem) / 3)',
+].join(', ')
 </script>
 
 <template>
@@ -63,7 +104,9 @@ const ratio = computed(() => {
   >
     <img
       v-if="object.cover"
-      :src="object.cover.apercu"
+      :src="object.cover.moyen ?? object.cover.apercu"
+      :srcset="srcset"
+      :sizes="srcset ? SIZES : undefined"
       :alt="object.cover.legende ?? object.titre"
       :width="object.cover.l"
       :height="object.cover.h"
