@@ -45,6 +45,18 @@ export interface Picture {
   plein: string
   /** Thumbnail URL. May be identical to `plein`. */
   apercu: string
+  /**
+   * URL of a **fixed-width** version, between `apercu` and `plein`. Optional:
+   * added to the format on 2026-08-25, so any collection published before then
+   * — and any picture whose derivative is not built yet — simply has none.
+   *
+   * It is the only one of the three that can carry an honest `w` descriptor:
+   * `apercu` is a bounding box, so its width depends on the orientation of the
+   * photograph, and the format never states it.
+   */
+  moyen?: string
+  /** Width of `moyen` in pixels. Present if and only if `moyen` is. */
+  moyen_l?: number
   /** Width of `plein` in pixels, used to reserve layout space. */
   l?: number
   /** Height of `plein` in pixels. */
