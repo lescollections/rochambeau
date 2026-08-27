@@ -1,6 +1,7 @@
 import { computed, readonly, ref, shallowRef } from 'vue'
 import type { Field, IndexedObject, Manifest } from '@/types'
 import { loadManifest, loadObjects } from '@/lib/loader'
+import { syncImageCache } from '@/lib/imageCache'
 import { shuffle } from '@/lib/shuffle'
 import { suggestLocale } from '@/lib/i18n'
 
@@ -56,6 +57,14 @@ export function load(force = false): Promise<void> {
       objects.value = Object.freeze(shuffle(list))
       received.value = list.length
       status.value = 'ready'
+
+      // Une republication change les clés d'images : les entrées que cette
+      // liste ne référence plus sont retirées du cache du service worker.
+      // Hors du chemin critique — la vitrine est déjà affichée — et sans effet
+      // tant que `genere_le` n'a pas bougé.
+      void syncImageCache(loaded.genere_le, objects.value).catch((cause) => {
+        console.warn('Rochambeau: alignement du cache d\'images impossible', cause)
+      })
     } catch (cause) {
       error.value = cause instanceof Error ? cause : new Error(String(cause))
       status.value = 'error'

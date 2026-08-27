@@ -109,11 +109,43 @@ export default defineConfig({
         navigateFallbackDenylist: [/\.(?:json|ndjson|csv|xlsx)$/, /^\/gestion(\/|$)/],
         runtimeCaching: [
           {
-            // Manifest and objects: served from cache, refreshed in the background.
+            // Manifeste et objets : le RÉSEAU D'ABORD, le cache seulement en secours.
+            //
+            // C'était l'inverse — StaleWhileRevalidate, expiration à 30 jours — et
+            // c'est ce qui a brisé les images d'exemple-toulouse. Constaté en
+            // production le 2026-08-27 : le locataire avait été détruit puis
+            // republié la veille au soir, ses identifiants de représentation étaient
+            // passés de `70-…` à `72-…`, et le navigateur servait une liste de la
+            // veille qui désignait des clés supprimées. Le serveur, lui, répondait
+            // juste (douze images tirées au hasard, douze fois 200 ; collection.json
+            // et objets.ndjson en `no-cache, must-revalidate`) : c'est la liste en
+            // cache qui mentait. Règle qui en découle — **une liste ne peut pas être
+            // plus vieille que ce qu'elle référence** : les images expirent en un
+            // jour (voir la règle suivante), la liste ne pouvait pas en tenir trente.
+            //
+            // Pourquoi NetworkFirst plutôt qu'une expiration plus courte : deux
+            // fichiers petits (2 Ko + 181 Ko sur exemple-toulouse), critiques —
+            // toute la vitrine en dépend — et demandés une seule fois par visite. Un
+            // aller-retour réseau est le prix juste pour ne jamais afficher un
+            // catalogue périmé, alors qu'une expiration, même courte, laisse toujours
+            // une fenêtre où la republication n'est pas vue.
+            // `networkTimeoutSeconds: 3` borne le « lie-fi » : passé trois secondes
+            // sans réponse, la copie en cache est servie et la requête réseau se
+            // poursuit — elle rafraîchit le cache pour la visite suivante.
+            //
+            // ⚠️ Le hors-ligne n'est pas perdu, c'est la seconde moitié de la
+            // stratégie : réseau injoignable ⇒ le `fetch` échoue tout de suite ⇒
+            // repli sur la copie en cache, et la vitrine déjà visitée s'affiche. La
+            // coquille et les actifs, eux, restent précachés (`globPatterns`).
+            // L'expiration reste à 30 jours mais elle change de rôle : elle ne
+            // gouverne plus la fraîcheur (le réseau s'en charge), elle ne dit plus
+            // que combien de temps une vitrine déjà visitée reste consultable sans
+            // réseau. La raccourcir n'améliorerait rien et amputerait le hors-ligne.
             urlPattern: ({ url }: { url: URL }) => /\.(?:json|ndjson)$/.test(url.pathname),
-            handler: 'StaleWhileRevalidate',
+            handler: 'NetworkFirst',
             options: {
               cacheName: 'rochambeau-data',
+              networkTimeoutSeconds: 3,
               expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
           },
